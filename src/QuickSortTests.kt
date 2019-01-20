@@ -1,6 +1,5 @@
 import kotlincommon.listOfInts
 import kotlincommon.permutations
-import kotlincommon.printed
 import kotlincommon.swap
 import kotlincommon.test.shouldEqual
 import org.junit.Test
@@ -24,18 +23,12 @@ class QuickSortTests {
         }
     }
 
-    @Test fun `sort list of 4 elements`() {
-        listOf(1, 2, 3, 4).permutations().forEach {
-            it.quickSorted() shouldEqual listOf(1, 2, 3, 4)
-        }
-    }
-
     @Test fun `sort random list`() {
         val list = Random.listOfInts(
             sizeRange = 0..100,
             valuesRange = 0..100
         )
-        list.printed().quickSorted().isSorted() shouldEqual true
+        list.quickSorted().isSorted() shouldEqual true
     }
 
     @Test fun `sort already sorted list`() {
@@ -51,20 +44,24 @@ fun <E: Comparable<E>> MutableList<E>.quickSort(
     to: Int = size - 1
 ): MutableList<E> {
     if (from >= to) return this
-    val i = hoarePartition(from, to)
+    val i = hoarePartition(this, from, to)
     quickSort(from, i)
     quickSort(i + 1, to)
     return this
 }
 
-fun <E: Comparable<E>> MutableList<E>.hoarePartition(from: Int, to: Int): Int {
-    val pivot = this[from]
+fun <E: Comparable<E>> hoarePartition(
+    list: MutableList<E>,
+    from: Int,
+    to: Int
+): Int {
+    val pivot = list[from]
     var i = from
     var j = to
     while (true) {
-        while (this[i] < pivot) i++
-        while (this[j] > pivot) j--
-        if (i < j) swap(i++, j--)
+        while (list[i] < pivot) i++
+        while (list[j] > pivot) j--
+        if (i < j) list.swap(i++, j--)
         else return j
     }
 }
