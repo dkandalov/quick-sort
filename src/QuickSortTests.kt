@@ -27,7 +27,7 @@ class QuickSortTests {
 
     @Test fun `sort random list`() {
         val list = Random.listOfInts(
-            sizeRange = 0..100_000,
+            sizeRange = 0..1_000_000,
             valuesRange = 0..100
         )
         list.quickSorted().isSorted() shouldEqual true
@@ -49,7 +49,7 @@ fun <E: Comparable<E>> MutableList<E>.quickSort(
     from: Int = 0,
     to: Int = size - 1
 ): MutableList<E> {
-    if (from >= to) return this
+    if (to <= from) return this
     val i = hoarePartition(this, from, to)
     quickSort(from, i)
     quickSort(i + 1, to)
@@ -58,19 +58,19 @@ fun <E: Comparable<E>> MutableList<E>.quickSort(
 
 fun <E: Comparable<E>> hoarePartition(list: MutableList<E>, from: Int, to: Int): Int {
     val pivot = list[from]
-    var left = from
-    var right = to
+    var left = from - 1
+    var right = to + 1
     while (true) {
-        while (list[left] < pivot) left++
-        while (list[right] > pivot) right--
-        if (left < right) list.swap(left++, right--)
+        do right-- while (list[right] > pivot)
+        do left++ while (list[left] < pivot)
+        if (left < right) list.swap(left, right)
         else return right
     }
 }
 
-fun <E: Comparable<E>> List<E>.quickSort_functional(): List<E> {
+fun <E: Comparable<E>> List<E>.quickSorted_functional(): List<E> {
     if (isEmpty()) return this
     val pivot = first()
-    val (left, right) = drop(1).partition { it < pivot }
-    return left.quickSort_functional() + pivot + right.quickSort_functional()
+    val (leftList, rightList) = drop(1).partition { it < pivot }
+    return leftList.quickSorted_functional() + pivot + rightList.quickSorted_functional()
 }
