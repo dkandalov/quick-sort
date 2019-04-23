@@ -13,12 +13,6 @@ class QuickSortTests {
         listOf(1).quickSorted() shouldEqual listOf(1)
     }
 
-    @Test fun `sort list of 2 elements`() {
-        listOf(1, 1).quickSorted() shouldEqual listOf(1, 1)
-        listOf(1, 2).quickSorted() shouldEqual listOf(1, 2)
-        listOf(2, 1).quickSorted() shouldEqual listOf(1, 2)
-    }
-
     @Test fun `sort list of 3 elements`() {
         listOf(1, 2, 3).permutations().forEach {
             it.printed().quickSorted() shouldEqual listOf(1, 2, 3)
@@ -27,18 +21,18 @@ class QuickSortTests {
 
     @Test fun `sort random list`() {
         val list = Random.listOfInts(
-            sizeRange = 0..1_000_000,
+            sizeRange = 0..100,
             valuesRange = 0..100
         )
-        list.quickSorted().isSorted() shouldEqual true
+        list.quickSorted().expectToBeSorted()
     }
 
     @Test fun `sort already sorted list`() {
-        (0..100_000).toList().quickSorted().isSorted() shouldEqual true
+        (0..100_000).toList().quickSorted().expectToBeSorted()
     }
 
-    private fun List<Int>.isSorted() =
-        windowed(size = 2).all { it[0] <= it[1] }
+    private fun <E: Comparable<E>> List<E>.expectToBeSorted() =
+        windowed(size = 2).all { it[0] <= it[1] } shouldEqual true
 }
 
 fun <E: Comparable<E>> List<E>.quickSorted(): List<E> {
@@ -56,7 +50,11 @@ fun <E: Comparable<E>> MutableList<E>.quickSort(
     return this
 }
 
-fun <E: Comparable<E>> hoarePartition(list: MutableList<E>, from: Int, to: Int): Int {
+fun <E: Comparable<E>> hoarePartition(
+    list: MutableList<E>,
+    from: Int,
+    to: Int
+): Int {
     val pivot = list[from]
     var left = from - 1
     var right = to + 1
@@ -69,8 +67,8 @@ fun <E: Comparable<E>> hoarePartition(list: MutableList<E>, from: Int, to: Int):
 }
 
 fun <E: Comparable<E>> List<E>.quickSorted_functional(): List<E> {
-    if (isEmpty()) return this
+    if (size <= 1) return this
     val pivot = first()
-    val (leftList, rightList) = drop(1).partition { it < pivot }
-    return leftList.quickSorted_functional() + pivot + rightList.quickSorted_functional()
+    val (left, right) = drop(1).partition { it < pivot }
+    return left.quickSorted_functional() + pivot + right.quickSorted_functional()
 }
