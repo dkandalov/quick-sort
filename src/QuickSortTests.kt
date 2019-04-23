@@ -20,11 +20,18 @@ class QuickSortTests {
     }
 
     @Test fun `sort random list`() {
-        val list = Random.listOfInts(
-            sizeRange = 0..100,
+        val list = Random(seed = 1234).listOfInts(
+            sizeRange = 0..1_000_000,
             valuesRange = 0..100
         )
         list.quickSorted().expectToBeSorted()
+    }
+
+    @Test fun `partition a list`() {
+        mutableListOf(3, 4, 2, 1).let {
+            it.hoarePartition() shouldEqual 1
+            it shouldEqual listOf(1, 2, 4, 3)
+        }
     }
 
     @Test fun `sort already sorted list`() {
@@ -42,26 +49,25 @@ fun <E: Comparable<E>> List<E>.quickSorted(): List<E> {
 fun <E: Comparable<E>> MutableList<E>.quickSort(
     from: Int = 0,
     to: Int = size - 1
-): MutableList<E> {
+): List<E> {
     if (to <= from) return this
-    val i = hoarePartition(this, from, to)
+    val i = this.hoarePartition(from, to)
     quickSort(from, i)
     quickSort(i + 1, to)
     return this
 }
 
-fun <E: Comparable<E>> hoarePartition(
-    list: MutableList<E>,
-    from: Int,
-    to: Int
+fun <E: Comparable<E>> MutableList<E>.hoarePartition(
+    from: Int = 0,
+    to: Int = size - 1
 ): Int {
-    val pivot = list[from]
+    val pivot = this[from]
     var left = from - 1
     var right = to + 1
     while (true) {
-        do right-- while (list[right] > pivot)
-        do left++ while (list[left] < pivot)
-        if (left < right) list.swap(left, right)
+        do right-- while (this[right] > pivot)
+        do left++ while (this[left] < pivot)
+        if (left < right) swap(left, right)
         else return right
     }
 }
