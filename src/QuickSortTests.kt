@@ -28,9 +28,13 @@ class QuickSortTests {
     }
 
     @Test fun `partition a list`() {
-        mutableListOf(3, 4, 2, 1).let {
-            it.hoarePartition() shouldEqual 1
-            it shouldEqual listOf(1, 2, 4, 3)
+        mutableListOf(4, 1, 3, 2, 5).let {
+            it.hoarePartition() shouldEqual 2
+            it shouldEqual mutableListOf(2, 1, 3, 4, 5)
+        }
+        mutableListOf(2, 1, 3).let {
+            it.hoarePartition() shouldEqual 0
+            it shouldEqual mutableListOf(1, 2, 3)
         }
     }
 
@@ -51,7 +55,7 @@ fun <E: Comparable<E>> MutableList<E>.quickSort(
     to: Int = size - 1
 ): List<E> {
     if (to <= from) return this
-    val i = this.hoarePartition(from, to)
+    val i = hoarePartition(from, to)
     quickSort(from, i)
     quickSort(i + 1, to)
     return this
@@ -67,7 +71,7 @@ fun <E: Comparable<E>> MutableList<E>.hoarePartition(
     while (true) {
         do right-- while (this[right] > pivot)
         do left++ while (this[left] < pivot)
-        if (left < right) swap(left, right)
+        if (left < right) this.swap(left, right)
         else return right
     }
 }
